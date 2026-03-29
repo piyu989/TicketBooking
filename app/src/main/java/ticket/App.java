@@ -3,12 +3,115 @@
  */
 package ticket;
 
-public class App {
-    public String getGreeting() {
-        return "Sita ram";
-    }
+import ticket.entities.User;
+import ticket.services.TrainService;
+import ticket.services.UserBookingService;
+import ticket.util.UserServiceUtil;
 
+import java.util.ArrayList;
+import java.util.Scanner;
+import java.util.UUID;
+
+public class App {
     public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
+
+        Scanner sc = new Scanner(System.in);
+
+        UserBookingService userBookingService;
+        TrainService trainService = new TrainService();
+
+
+        try {
+            userBookingService = new UserBookingService();
+            System.out.println("done use from db");
+            int option;
+            int userId = 0;
+            while (true){
+                System.out.println("1 for signup");
+                System.out.println("2 for Login");
+                System.out.println("3 fetch booking");
+                System.out.println("4 search trains");
+                System.out.println("5 book seat");
+                System.out.println("6 cancel booking");
+                System.out.println("7 exit app");
+                option = sc.nextInt();
+                sc.nextLine();
+
+                switch (option){
+                    case 1:
+                        userId++;
+                        System.out.println("enter user name to signup");
+                        String name = sc.nextLine();
+                        System.out.println("enter the password to signup");
+                        String password = sc.nextLine();
+                        User user = User.builder()
+                                .name(name)
+                                .password(password)
+                                .hashedPassword(UserServiceUtil.hashPassword(password))
+                                .userId(UUID.randomUUID().toString())
+                                .ticketBooked(new ArrayList<>())
+                                .build();
+                        userBookingService.signUp(user);
+                        break;
+
+                    case 2:
+                        System.out.println("Enter username");
+                        String username = sc.nextLine();
+                        System.out.println("enter password for login: ");
+                        String pwd = sc.nextLine();
+                        User userToLogin = User.builder()
+                                .name(username)
+                                .password(pwd)
+                                .hashedPassword(UserServiceUtil.hashPassword(pwd))
+                                .build();
+                        userBookingService = new UserBookingService(userToLogin);
+                        System.out.println("is user logined ->" +userBookingService.loginUser());
+                        break;
+                    case 3:
+                        System.out.println("Enter username");
+                        String username1 = sc.nextLine();
+                        System.out.println("enter password for login: ");
+                        String pwd1 = sc.nextLine();
+                        User userToLogin1 = User.builder()
+                                .name(username1)
+                                .password(pwd1)
+                                .hashedPassword(UserServiceUtil.hashPassword(pwd1))
+                                .build();
+                        userBookingService = new UserBookingService(userToLogin1);
+                        System.out.println("is user logined ->" +userBookingService.loginUser());
+                        userBookingService.fetchBooking();
+                        break;
+                    case 4:
+                        System.out.println("enter source: ");
+                        String source = sc.nextLine();
+                        System.out.println("enter destination: ");
+                        String destination = sc.nextLine();
+                        trainService.searchTrain(source,destination);
+                        System.out.println("search train");
+                        break;
+                    case 5:
+                        System.out.println("enter train no:");
+                        int trainNo = sc.nextInt();
+                        System.out.println("enter no of seats to book: ");
+                        int noOfSeats = sc.nextInt();
+                        trainService.bookSeat(noOfSeats,trainNo);
+                        break;
+                    case 6:
+                        System.out.println("enter train no:");
+                        int trainNoo = sc.nextInt();
+                        System.out.println("enter no of seats to book: ");
+                        int noOfSeat = sc.nextInt();
+                        trainService.cancelBooking(noOfSeat,trainNoo);
+                        break;
+                    case 7:
+                            System.out.println("exiting app");
+                            System.exit(0);
+                            break;
+
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }
